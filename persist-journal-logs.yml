@@ -1,0 +1,22 @@
+---
+
+- hosts: node1 
+  gather_facts: false
+  become: true
+  tasks:
+   - name: set storage to persistent in journald config
+     lineinfile: 
+      path: /etc/systemd/journald.conf
+      regexp: '#Storage=auto'
+      line: 'Storage=persistent'
+ 
+   - name: create journal directory
+     file:
+      path: /var/log/journal
+      state: directory
+
+   - name: restart systemd-journald
+     systemd:
+      name: systemd-journald
+      state: restarted
+      enabled: yes

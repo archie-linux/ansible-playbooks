@@ -1,0 +1,15 @@
+---
+
+- hosts: testvms
+  gather_facts: false
+  tasks:
+   - name: ping nodes
+     ping:
+     register: ping_out
+
+   - name: run command
+     command: uname -a 
+     register: command_out
+
+   - debug: msg="{{ ping_out }}"
+   - debug: msg="{{ command_out }}"

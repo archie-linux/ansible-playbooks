@@ -1,0 +1,69 @@
+---
+
+# Configure nfs-server on node2
+- hosts: node2
+  gather_facts: false
+  become: true
+  tasks:
+   - name: install nfs
+     apt: name=nfs-server state=latest
+
+   - name: create nfs dirs
+     file:
+      path: "{{ item }}"
+      state: directory
+     with_items:
+       - /export/nfs_data1
+       - /export/nfs_data2
+
+   - name: configure exports file
+     lineinfile:
+      path: /etc/exports
+      line: "{{ item }}"
+      create: yes
+     with_items:
+      - "/export/nfs_data1     node1(rw,sync,no_root_squash)"
+      - "/export/nfs_data2     node1(rw,sync,no_root_squash)"
+
+   - name: start nfs server
+     systemd:
+      name: nfs-server
+      state: started
+      enabled: yes
+
+# Configure nfs client on node1
+- hosts: node1
+  gather_facts: false
+  become: true
+  tasks:
+   - name: install nfs-common
+     apt: name=nfs-common state=latest
+
+   - name: create nfs mounts
+     file:
+      path: "{{ item }}"
+      state: directory
+     with_items:
+       - /mnt/nfs_data_1
+       - /mnt/nfs_data_2
+
+   - name: mount nfs dir 1
+     mount:
+      path: /mnt/nfs_data_1
+      src: node2:/export/nfs_data1
+      fstype: nfs
+      state: present
+     notify: reboot server
+
+   - name: mount nfs dir 2
+     mount:
+      path: /mnt/nfs_data_2
+      src: node2:/export/nfs_data2
+      fstype: nfs
+      state: present
+     notify: reboot server
+
+
+  handlers:
+   - name: reboot server
+     reboot:

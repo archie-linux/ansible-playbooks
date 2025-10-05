@@ -1,0 +1,48 @@
+---
+# Steps to test Lacp config after running the playbook
+#
+#      - View bonding configuration: cat /proc/net/bonding/bond0
+#      - View Active slave: cat /sys/class/net/bond0/bonding/active_slave
+#      - ping -I bond0 [bond0_ip]
+#      - ifdown [primary_slave_interface]. Verify active slave switches to secondary slave interface.
+#      - ifup [primary_slave_interface]. Verify active slave switched back to primary slave
+#      - Ping traffic should not get interrupted during active-passive failover.
+#
+#
+
+- hosts: "{{ variable_host | default('node1') }}"
+  gather_facts: false
+  become: true
+  vars:
+   config_file: "{{ lookup('env', 'config_file') | default('files/active-passive_config_1.cfg', 'True') }}"
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Configure LACP Bonding play started.."
+   - name: install package
+
+     apt:
+      name: "{{ packages }}"
+      state: present
+     vars:
+      packages:
+       - vlan
+       - ifenslave
+   - name: copy required kernel modules at boot
+     copy:
+      src: files/modules
+      dest: /etc/modules
+   - name: copy lacp network config
+     copy:
+      src: "{{ config_file }}"
+      dest: /etc/network/interfaces.d/70-cloud-init.cfg
+     notify: reboot server
+
+  handlers:
+
+   # Bring up failed interfaces after reboot
+   - name: reboot server
+     reboot:
+      test_command: "{{ item }}"
+     with_items:
+      - "ifup enp0s9 --force"
+      - "ifup enp0s10 --force"

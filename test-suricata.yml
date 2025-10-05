@@ -1,0 +1,9 @@
+---
+
+
+ # Update hosts file on both nodes
+- import_playbook: configure-networking.yml
+
+- import_playbook: deploy-suricata.yml
+
+- import_playbook: traffic-generator.yml

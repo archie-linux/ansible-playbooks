@@ -1,0 +1,36 @@
+---
+
+# Run all the playbooks
+
+- import_playbook: install-packages.yml
+
+- import_playbook: configure-fail2ban.yml
+
+- import_playbook: configure-firewall.yml
+
+- import_playbook: configure-web-server.yml
+
+- import_playbook: fetch-logs.yml
+
+- import_playbook: monitor-disk-usage.yml
+
+  # Configures static ip on node1
+- import_playbook: configure-static-ips.yml -e config_file=files/static-ip_config_1
+
+ # Configures static ip on node2
+- import_playbook: configure-static-ips.yml variable_host='node2' -e config_file=files/static-ip_config_2
+
+ # Configures lacp bonding on node 1
+- import_playbook: configure-lacp-bonding.yml -e config_file=files/active-passive_config_1.cfg
+
+ # Configure lacp bonding on node 2
+- import_playbook: configure-lacp-bonding.yml variable_host='node2' -e config_file=files/active-passive_config_2.cfg
+
+ # Update hosts file on both nodes
+- import_playbook: update_hosts_file.yml
+
+- import_playbook: deploy-docker.yml
+
+- import_playbook: deploy-jenkins.yml
+
+- import_playbook: deploy-executable.yml

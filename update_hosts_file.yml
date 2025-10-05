@@ -1,0 +1,13 @@
+---
+
+- hosts: testvms 
+  become: true
+  tasks:
+   - name: update hosts file
+     lineinfile:
+      path: /etc/hosts
+      insertafter: EOF
+      line: "{{ item }}"
+     with_items:
+      - "{{ hostvars['node1']['ansible_enp0s8']['ipv4']['address'] }} {{ hostvars['node1']['ansible_hostname'] }}"
+      - "{{ hostvars['node2']['ansible_enp0s8']['ipv4']['address'] }} {{ hostvars['node2']['ansible_hostname'] }}"

@@ -1,0 +1,10 @@
+---
+
+# Configure static ips on interface enp0s8
+- include: configure-static-ips.yml
+
+ # Configures static ip on node2
+- import_playbook: configure-static-ips.yml variable_host='node2' -e config_file=files/static-ip_config_2
+
+ # Update hosts file on both nodes
+- import_playbook: update_hosts_file.yml

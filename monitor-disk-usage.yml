@@ -1,0 +1,12 @@
+---
+
+- hosts: testvms
+  gather_facts: false
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Monitor disk usage play started.."
+   - name: configure cron job
+     cron:
+      minute: "1"
+      job: "today=`date +%Y-%m-%d_%H-%M-%S`; df -h > /tmp/${today}.txt 2>&1"
+      user: vagrant

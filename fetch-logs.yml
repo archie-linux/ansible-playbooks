@@ -1,0 +1,18 @@
+---
+
+- hosts: testvms
+  become: true
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Fetch Logs play started.."
+   - name: create a compress archive
+     archive:
+      path: /var/log/*.log
+      dest: /tmp/logs.tgz
+      format: gz
+
+   - name: fetch compress archive
+     fetch:
+      src: /tmp/logs.tgz
+      dest: "./{{ ansible_hostname }}/"
+      flat: yes

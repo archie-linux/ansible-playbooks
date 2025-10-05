@@ -1,0 +1,21 @@
+---
+
+- hosts: "{{ variable_host | default('node1') }}"
+  become: true
+  gather_facts: false
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Configure Fail2ban play started.."
+   - name: install fail2ban
+     apt: 
+      name: fail2ban 
+      state: present 
+   - name: copy fail2ban configuration file
+     copy:
+      src: ./files/jail.conf
+      dest: /etc/fail2ban/jail.local
+   - name: restart fail2ban service
+     service:
+      name: fail2ban
+      state: restarted
+      enabled: yes

@@ -1,0 +1,29 @@
+---
+
+- import_playbook: configure-networking.yml
+
+- import_playbook: configure-nfs.yml
+
+- hosts: node1
+  gather_facts: false
+  become: true
+  tasks:
+   - name: create files to test nfs mounts
+     file:
+      path: /mnt/nfs_data_{{ item }}/testfile1
+      state: touch
+     with_items:
+      - 1
+      - 2
+     tags:
+      - test
+
+   - name: create directories to test nfs mounts
+     file:
+      path: /mnt/nfs_data_{{ item }}/testdir1
+      state: directory
+     with_items:
+      - 1
+      - 2
+     tags:
+      - test

@@ -1,0 +1,39 @@
+---
+
+# Playbook to setup jenkins server
+# Add the following port forwarding rule to access jenkins server on localhost
+#  localhost:8081 => [guest_vm_ip]:8080
+
+- hosts: "{{ variable_host | default('node1') }}"
+  become: true
+  gather_facts: false
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Deploy Jenkins play started.."
+   - name: install java
+     apt: name=openjdk-8-jdk state=present update_cache=yes
+   - name: add gpgkey
+     apt_key:
+      url: https://pkg.jenkins.io/debian/jenkins.io.key 
+      state: present
+   - name: add jenkins repository
+     lineinfile:
+      path: /etc/apt/sources.list.d/jenkins.list
+      line: deb https://pkg.jenkins.io/debian-stable binary/
+      create: yes
+   - name: install jenkins
+     apt:
+      name: jenkins
+      state: latest
+      update_cache: yes
+   - name: start jenkins
+     service:
+      name: jenkins
+      state: started
+      enabled: yes
+   - name: configure ufw
+     ufw:
+      rule: allow
+      state: enabled
+      port: 22,8080
+      proto: tcp

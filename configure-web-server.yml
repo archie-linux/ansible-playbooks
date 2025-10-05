@@ -1,0 +1,17 @@
+---
+
+- hosts: "{{ variable_host | default('node1')}}"
+  become: true
+  gather_facts: false
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Configure Webserver play started.."
+   - name: install apache2
+     apt:
+      name: apache2
+      state: latest
+   - name: enable and start apache2
+     service:
+      name: apache2
+      enabled: yes
+      state: started 

@@ -1,0 +1,17 @@
+# This file is generated from information provided by
+# the datasource.  Changes to it will not persist across an instance.
+# To disable cloud-init's network configuration capabilities, write a file
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
+auto lo
+iface lo inet loopback
+
+auto enp0s8
+iface enp0s8 inet static
+  address 192.168.0.21
+  netmask 255.255.255.0
+
+auto enp0s8:0
+iface enp0s8:0 inet static
+  address 172.100.0.10
+  netmask 255.255.255.0

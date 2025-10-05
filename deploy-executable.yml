@@ -1,0 +1,30 @@
+---
+# Run playbook with env variables: ansible-playbook deploy-executable.yml -e script_name=[script name] -e execute=true
+
+- hosts: testvms
+  become: true
+  gather_facts: false
+  vars:
+   script_name: "{{ lookup('env', 'script_name') | default('files/create_file', True) }}"
+   execute: false
+  tasks:
+   - name: copy executable script
+     copy:
+      src: "{{ script_name }}"
+      dest: /opt
+      owner: vagrant
+      group: vagrant
+      mode: 0755
+
+   - name: add executable to PATH env
+     lineinfile:
+      path: /home/vagrant/.bashrc
+      line: 'export PATH=$PATH:/opt'
+      insertafter: EOF
+      state: present
+      create: yes
+
+   - name: execute script
+     script:
+      cmd: "{{ script_name }}"
+     when: execute

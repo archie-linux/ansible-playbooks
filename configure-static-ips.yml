@@ -1,0 +1,21 @@
+---
+# Playbook command: ansible-playbook configure-networking.yml -e config_file=[file_name]
+
+- hosts: "{{ variable_host | default('node1') }}"
+  gather_facts: false
+  become: true
+  vars:
+    config_file: "{{ lookup('env', 'config_file') | default('files/static-ip_config_1', 'True') }}"
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Configure Static IP's play started.."
+   - name: copy network config
+     copy:
+      src: "{{ config_file }}"
+      dest: /etc/network/interfaces.d/60-cloud-init.cfg
+     notify: reboot server
+
+  handlers:
+   - name: reboot server
+     reboot:
+

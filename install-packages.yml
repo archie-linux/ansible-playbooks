@@ -1,0 +1,22 @@
+---
+
+- hosts: testvms
+  become: true
+  tasks:
+   - name: playbook execution begins
+     debug: msg="Install packages play started.."
+   - name: install packages
+     apt:
+      name: "{{ packages }}"
+      state: latest
+     vars:
+      packages:
+      - nmap
+      - wireshark
+      - nikto
+      - lynis
+      - radare2
+      - clamav
+      - rkhunter
+      - chkrootkit
+      - hping3

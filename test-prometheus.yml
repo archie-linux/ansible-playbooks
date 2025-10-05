@@ -1,0 +1,27 @@
+---
+
+- import_playbook: deploy-prometheus.yml
+
+- hosts: node1
+  gather_facts: false
+  tasks:
+   - name: check if prometheus and node_exporter is running
+     uri: 
+      url: http://localhost:{{ item }}
+      status: 200
+     with_items:
+      - 9090
+      - 9100
+     tags:
+      - test
+
+   - name: fetch node_exporter metrics
+     command: curl http://localhost:9100/metrics
+     register: metrics
+     tags:
+      - test
+
+   - debug: 
+      msg: "{{ metrics.stdout_lines }}"
+     tags:
+      - test
